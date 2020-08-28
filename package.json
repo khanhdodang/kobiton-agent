@@ -1,5 +1,5 @@
 {
-  "name": "kobitonagent",
+  "name": "kobiton-agent",
   "version": "1.0.0",
   "description": "Sample code to check the device is ready to use",
   "main": "index.js",
@@ -21,6 +21,6 @@
   },
   "homepage": "https://github.com/khanhdodang/kobiton-agent#readme",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
+    "registry": "https://npm.pkg.github.com/khanhdo"
   }
 }
