@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/khanhdodang/kobiton-agent/issues"
   },
-  "homepage": "https://github.com/khanhdodang/kobiton-agent#readme"
+  "homepage": "https://github.com/khanhdodang/kobiton-agent#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
 }
