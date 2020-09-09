@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/khanhdodang/kobiton-agent#readme",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/khanhdo"
-  }
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {}
 }
