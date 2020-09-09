@@ -3,9 +3,6 @@ const BPromise = require('bluebird')
 
 const sendRequest = BPromise.promisify(request)
 
-const username = process.env.KOBITON_USERNAME
-const apiKey = process.env.KOBITON_API_KEY
-const DEVICE_GROUP = process.env.DEVICE_GROUP || 'cloud'
 const UDID = process.env.UDID || '*'
 const TIMEOUT = process.env.TIMEOUT || 120 // seconds
 
@@ -13,7 +10,7 @@ const headers = {
     'Accept': 'application/json'
 }
 
-async function getOnlineDevice() {
+async function getOnlineDevice(username, apiKey) {
   let response
   try {
     response = await sendRequest({
@@ -40,7 +37,7 @@ async function getOnlineDevice() {
   return response.body
 }
 
-async function filterDevice(deviceList, deviceGroup, udid) {
+function filterDevice(deviceList, deviceGroup, udid) {
 
   const {cloudDevices, privateDevices, favoriteDevices} = deviceList
   let devices
@@ -62,26 +59,12 @@ async function filterDevice(deviceList, deviceGroup, udid) {
   let device
 
   if (UDID === '*') {
-    device = await devices[0]
+    device = devices[0]
   } else {
-    device = await devices.filter((d) => d.udid === udid)
+    device = devices.filter((d) => d.udid === udid)
   }
   
   return (Array.isArray(device) && device.length > 0)
 }
 
-async function main() {
-  if(!username || !apiKey)
-  {
-    console.log('KOBITON_USERNAME and KOBITON_APIKEY variables are need to execute the script')
-    process.exit(1)
-  }
-
-  for (let i = 0; i < TIMEOUT; i++) {
-    let devices = await getOnlineDevice()
-    let result = await filterDevice(devices, DEVICE_GROUP, UDID)
-    if (result) {break}
-  }
-}
-
-main()
+module.exports = {getOnlineDevice, filterDevice}
