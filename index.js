@@ -1,9 +1,7 @@
 const request = require('request')
 const BPromise = require('bluebird')
-
 const sendRequest = BPromise.promisify(request)
 
-const UDID = process.env.UDID || '*'
 const TIMEOUT = process.env.TIMEOUT || 120 // seconds
 
 const headers = {
@@ -37,7 +35,7 @@ async function getOnlineDevice(username, apiKey) {
   return response.body
 }
 
-function filterDevice(deviceList, deviceGroup, udid) {
+async function filterDevice(deviceList, deviceGroup, udid) {
 
   const {cloudDevices, privateDevices, favoriteDevices} = deviceList
   let devices
@@ -58,13 +56,22 @@ function filterDevice(deviceList, deviceGroup, udid) {
   }
   let device
 
-  if (UDID === '*') {
+  if (udid === '*') {
     device = devices[0]
   } else {
     device = devices.filter((d) => d.udid === udid)
   }
   
-  return (Array.isArray(device) && device.length > 0)
+  return (Object.keys(device).length > 0)
+}
+
+async function waitDeviceOnline(username, apiKey, deviceGroup, udid) {
+  for (let i = 0; i < TIMEOUT; i++) {
+    let devices = await getOnlineDevice(username, apiKey)
+    let result = filterDevice(devices, deviceGroup, udid)
+    BPromise.delay(1000)
+    if (result) {break}
+  }
 }
 
 module.exports = {getOnlineDevice, filterDevice}
