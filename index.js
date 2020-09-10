@@ -2,8 +2,6 @@ const request = require('request')
 const BPromise = require('bluebird')
 const sendRequest = BPromise.promisify(request)
 
-const TIMEOUT = process.env.TIMEOUT || 120 // seconds
-
 const headers = {
     'Accept': 'application/json'
 }
@@ -65,8 +63,8 @@ async function filterDevice(deviceList, deviceGroup, udid) {
   return (Object.keys(device).length > 0)
 }
 
-async function waitDeviceOnline(username, apiKey, deviceGroup, udid) {
-  for (let i = 0; i < TIMEOUT; i++) {
+async function waitDeviceOnline(username, apiKey, deviceGroup, udid, timeOut = 500) {
+  for (let i = 0; i < timeOut; i++) {
     let devices = await getOnlineDevice(username, apiKey)
     let result = await filterDevice(devices, deviceGroup, udid)
     await BPromise.delay(1000)
