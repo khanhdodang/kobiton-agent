@@ -57,9 +57,9 @@ async function filterDevice(deviceList, deviceGroup, udid) {
   let device
 
   if (udid === '*') {
-    device = devices[0]
+    device = await devices[0]
   } else {
-    device = devices.filter((d) => d.udid === udid)
+    device = await devices.filter((d) => d.udid === udid)
   }
   
   return (Object.keys(device).length > 0)
@@ -68,8 +68,8 @@ async function filterDevice(deviceList, deviceGroup, udid) {
 async function waitDeviceOnline(username, apiKey, deviceGroup, udid) {
   for (let i = 0; i < TIMEOUT; i++) {
     let devices = await getOnlineDevice(username, apiKey)
-    let result = filterDevice(devices, deviceGroup, udid)
-    BPromise.delay(1000)
+    let result = await filterDevice(devices, deviceGroup, udid)
+    await BPromise.delay(1000)
     if (result) {break}
   }
 }
