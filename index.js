@@ -74,4 +74,4 @@ async function waitDeviceOnline(username, apiKey, deviceGroup, udid) {
   }
 }
 
-module.exports = {getOnlineDevice, filterDevice}
+module.exports = {waitDeviceOnline}
