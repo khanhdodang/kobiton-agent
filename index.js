@@ -96,7 +96,7 @@ async function waitDeviceOnlineByDeviceName(username, apiKey, deviceGroup, devic
     let devices = await getOnlineDevice(username, apiKey)
     let result = await _filterByDeviceName(devices, deviceGroup, deviceName)
     console.log('result', result)
-    await BPromise.delay(1000)
+    await BPromise.delay(3000)
     if (result) {
       break
     }
@@ -115,7 +115,7 @@ async function waitDeviceOnlineByPlatformName(username, apiKey, deviceGroup, pla
   for (let i = 0; i < timeOut; i++) {
     let devices = await getOnlineDevice(username, apiKey)
     let result = await _filterByPlatformName(devices, deviceGroup, platformName)
-    await BPromise.delay(1000)
+    await BPromise.delay(3000)
     if (result) {
       break
     }
@@ -134,7 +134,7 @@ async function waitDeviceOnline(username, apiKey, deviceGroup, udid, timeOut = 5
   for (let i = 0; i < timeOut; i++) {
     let devices = await getOnlineDevice(username, apiKey)
     let result = await _filterByDeviceUDID(devices, deviceGroup, udid)
-    await BPromise.delay(1000)
+    await BPromise.delay(3000)
     if (result) {
       break
     }
