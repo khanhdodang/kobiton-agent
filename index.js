@@ -141,15 +141,6 @@ async function waitDeviceOnline(username, apiKey, deviceGroup, udid, timeOut = 5
   }
 }
 
-async function main() {
-  const username = ''
-  const apiKey = ''
-  await waitDeviceOnline(username, apiKey, 'cloud', 'LGD724e1099033', 500)
-  await waitDeviceOnlineByDeviceName(username, apiKey, 'cloud', 'Galaxy C5', 500)
-  await waitDeviceOnlineByPlatformName(username, apiKey, 'cloud', 'android')
-}
-main()
-
 module.exports = {
   waitDeviceOnlineByDeviceName,
   waitDeviceOnlineByPlatformName,
