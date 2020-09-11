@@ -3,7 +3,7 @@ const BPromise = require('bluebird')
 const sendRequest = BPromise.promisify(request)
 
 const headers = {
-    'Accept': 'application/json'
+  'Accept': 'application/json'
 }
 
 async function getOnlineDevice(username, apiKey) {
@@ -18,9 +18,8 @@ async function getOnlineDevice(username, apiKey) {
         pass: apiKey
       },
       headers
-      })
-  }
-  catch (err) {
+    })
+  } catch (err) {
     console.error('Error occured while sending request to Kobiton via API', err)
   }
 
@@ -33,9 +32,12 @@ async function getOnlineDevice(username, apiKey) {
   return response.body
 }
 
-async function filterDevice(deviceList, deviceGroup, udid) {
-
-  const {cloudDevices, privateDevices, favoriteDevices} = deviceList
+async function _filterByDeviceGroup(deviceList, deviceGroup) {
+  const {
+    cloudDevices,
+    privateDevices,
+    favoriteDevices
+  } = deviceList
   let devices
 
   switch (deviceGroup.toLowerCase()) {
@@ -52,6 +54,24 @@ async function filterDevice(deviceList, deviceGroup, udid) {
       devices = cloudDevices
       break
   }
+  return devices
+}
+
+async function _filterByDeviceName(deviceList, deviceGroup, deviceName) {
+  let devices = await _filterByDeviceGroup(deviceList, deviceGroup)
+  let device = await devices.filter((d) => d.deviceName === deviceName)
+  return (Array.isArray(device) && device.length > 0)
+}
+
+async function _filterByPlatformName(deviceList, deviceGroup, platformName) {
+  let devices = await _filterByDeviceGroup(deviceList, deviceGroup)
+  let device = await devices.filter((d) => d.platformName.toLowerCase() === platformName.toLowerCase())
+  return (Array.isArray(device) && device.length > 0)
+}
+
+async function _filterByDeviceUDID(deviceList, deviceGroup, udid) {
+  let devices = await _filterByDeviceGroup(deviceList, deviceGroup)
+
   let device
 
   if (udid === '*') {
@@ -59,17 +79,79 @@ async function filterDevice(deviceList, deviceGroup, udid) {
   } else {
     device = await devices.filter((d) => d.udid === udid)
   }
-  
+
   return (Object.keys(device).length > 0)
 }
 
-async function waitDeviceOnline(username, apiKey, deviceGroup, udid, timeOut = 500) {
+/**
+ * Wait for the device only by Device Name
+ * @param username {string} - Username
+ * @param apiKey {string} - API Key
+ * @param deviceGroup {string} - they are cloud, private, fovorite
+ * @param deviceName {string} - Device Name
+ * @param timeOut {int} - The default timeout is 500 seconds
+ */
+async function waitDeviceOnlineByDeviceName(username, apiKey, deviceGroup, deviceName, timeOut = 500) {
   for (let i = 0; i < timeOut; i++) {
     let devices = await getOnlineDevice(username, apiKey)
-    let result = await filterDevice(devices, deviceGroup, udid)
+    let result = await _filterByDeviceName(devices, deviceGroup, deviceName)
+    console.log('result', result)
     await BPromise.delay(1000)
-    if (result) {break}
+    if (result) {
+      break
+    }
   }
 }
 
-module.exports = {waitDeviceOnline}
+/**
+ * Wait for the device only by Platform Name
+ * @param username {string} - Username
+ * @param apiKey {string} - API Key
+ * @param deviceGroup {string} - they are cloud, private, fovorite
+ * @param platformName {string} - Platform Name
+ * @param timeOut {int} - The default timeout is 500 seconds
+ */
+async function waitDeviceOnlineByPlatformName(username, apiKey, deviceGroup, platformName, timeOut = 500) {
+  for (let i = 0; i < timeOut; i++) {
+    let devices = await getOnlineDevice(username, apiKey)
+    let result = await _filterByPlatformName(devices, deviceGroup, platformName)
+    await BPromise.delay(1000)
+    if (result) {
+      break
+    }
+  }
+}
+
+/**
+ * Wait for the device only by UDID
+ * @param username {string} - Username
+ * @param apiKey {string} - API Key
+ * @param deviceGroup {string} - they are cloud, private, fovorite
+ * @param udid {string} - UDID
+ * @param timeOut {int} - The default timeout is 500 seconds
+ */
+async function waitDeviceOnline(username, apiKey, deviceGroup, udid, timeOut = 500) {
+  for (let i = 0; i < timeOut; i++) {
+    let devices = await getOnlineDevice(username, apiKey)
+    let result = await _filterByDeviceUDID(devices, deviceGroup, udid)
+    await BPromise.delay(1000)
+    if (result) {
+      break
+    }
+  }
+}
+
+async function main() {
+  const username = ''
+  const apiKey = ''
+  await waitDeviceOnline(username, apiKey, 'cloud', 'LGD724e1099033', 500)
+  await waitDeviceOnlineByDeviceName(username, apiKey, 'cloud', 'Galaxy C5', 500)
+  await waitDeviceOnlineByPlatformName(username, apiKey, 'cloud', 'android')
+}
+main()
+
+module.exports = {
+  waitDeviceOnlineByDeviceName,
+  waitDeviceOnlineByPlatformName,
+  waitDeviceOnline
+}
