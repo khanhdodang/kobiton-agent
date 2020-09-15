@@ -59,7 +59,8 @@ async function _filterByDeviceGroup(deviceList, deviceGroup) {
 
 async function _filterByDeviceName(deviceList, deviceGroup, deviceName) {
   let devices = await _filterByDeviceGroup(deviceList, deviceGroup)
-  let device = await devices.filter((d) => d.deviceName === deviceName)
+  let device = await devices.filter((d) => d.deviceName === deviceName &&
+    d.state === 'ACTIVATED')
   return (Array.isArray(device) && device.length > 0)
 }
 
@@ -78,7 +79,8 @@ async function _filterByDeviceUDID(deviceList, deviceGroup, udid) {
   if (udid === '*') {
     device = await devices[0]
   } else {
-    device = await devices.filter((d) => d.udid === udid)
+    device = await devices.filter((d) => d.udid === udid &&
+      d.state === 'ACTIVATED')
   }
 
   return (Object.keys(device).length > 0)
@@ -96,7 +98,7 @@ async function waitDeviceOnlineByDeviceName(username, apiKey, deviceGroup, devic
   for (let i = 0; i < timeOut; i++) {
     let devices = await getOnlineDevice(username, apiKey)
     let result = await _filterByDeviceName(devices, deviceGroup, deviceName)
-    await BPromise.delay(3000)
+    await BPromise.delay(5000)
     if (result) {
       break
     }
@@ -115,10 +117,8 @@ async function waitDeviceOnlineByPlatformName(username, apiKey, deviceGroup, pla
   for (let i = 0; i < timeOut; i++) {
     let devices = await getOnlineDevice(username, apiKey)
     let result = await _filterByPlatformName(devices, deviceGroup, platformName)
-    await BPromise.delay(3000)
-    if (result) {
-      break
-    }
+    await BPromise.delay(5000)
+    if (result) break
   }
 }
 
@@ -134,10 +134,8 @@ async function waitDeviceOnline(username, apiKey, deviceGroup, udid, timeOut = 5
   for (let i = 0; i < timeOut; i++) {
     let devices = await getOnlineDevice(username, apiKey)
     let result = await _filterByDeviceUDID(devices, deviceGroup, udid)
-    await BPromise.delay(3000)
-    if (result) {
-      break
-    }
+    await BPromise.delay(5000)
+    if (result) break
   }
 }
 
